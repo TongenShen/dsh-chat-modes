@@ -2,7 +2,7 @@
  * 三个聊天模式的设置页（Client 半）。
  *
  * 在「设置 → Agent presets」组的同一排里加一个独立页面，三行开关。
- * 开关状态通过 `/api/chat-modes` 读写，由 Host 侧持久化到插件自己的配置行。
+ * 开关状态通过 `/api/chat-modes/bundle` 读写，由 Host 侧持久化到插件自己的配置行。
  *
  * 只 `require('react')`：宿主 Client 模块表提供它，不 import 任何
  * Harness Client 包，避免与宿主版本耦合。
@@ -15,7 +15,7 @@ window.__ModuleLoader__.load({
 
     const NS = 'dsh-chat-modes'
     const CLS = 'dcm'
-    const ENDPOINT = '/api/chat-modes'
+    const ENDPOINT = '/chat-modes/switches'
 
     /** 三行开关的定义，顺序与 Host 侧 MODES 一致。 */
     const ROWS = [
@@ -109,16 +109,19 @@ window.__ModuleLoader__.load({
 
       const load = React.useCallback(() => {
         setState({ phase: 'loading', value: null })
-        fetch(ENDPOINT, { cache: 'no-store' })
-          .then((response) => response.json())
+        fetch(ENDPOINT, { cache: 'no-store', credentials: 'same-origin' })
+          .then((response) => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`)
+            return response.json()
+          })
           .then((body) => {
             if (body && body.ok === true && body.value) {
               setState({ phase: 'ready', value: body.value })
             } else {
-              setState({ phase: 'error', value: null })
+              setState({ phase: 'error', value: null, detail: 'unexpected payload' })
             }
           })
-          .catch(() => setState({ phase: 'error', value: null }))
+          .catch((error) => setState({ phase: 'error', value: null, detail: String(error && error.message ? error.message : error) }))
       }, [])
 
       React.useEffect(() => {
@@ -156,6 +159,11 @@ window.__ModuleLoader__.load({
       if (state.phase === 'error') {
         return h('div', { className: CLS + '_page' }, [
           h('div', { key: 'err', className: CLS + '_error' }, t('state.error')),
+          // 把真实原因露出来，否则只能看到一句「读取失败」，没法判断是路由没注册、
+          // 鉴权被拒还是载荷不对。
+          state.detail
+            ? h('div', { key: 'detail', className: CLS + '_status' }, state.detail)
+            : null,
           h('button', { key: 'retry', type: 'button', className: CLS + '_retry', onClick: load }, t('state.retry')),
         ])
       }

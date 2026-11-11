@@ -39,16 +39,18 @@ Disabling is not hiding; the preset is **never registered**. The new-session lis
 
 ### Host half (`index.js`)
 
-Registers the enabled modes into `agentPresets` and exposes two authenticated Fetch routes for the settings page:
+Registers the enabled modes into `agentPresets` and exposes a read/write endpoint on the webServer that carries the GUI:
 
 ```text
-GET  /api/chat-modes  -> { chat, extremeChat, statelessChat }
-POST /api/chat-modes  <- { key, enabled }
+GET  /chat-modes/switches  -> { chat, extremeChat, statelessChat }
+POST /chat-modes/switches  <- { key, enabled }
 ```
 
 Writes go through `configEditor.edit()`, which stores the value in this plugin's own configuration row — the supported way for a plugin to persist its configuration. The edit restarts the plugin, so `apply` re-registers with the new values and the switches survive a restart.
 
-The routes use `connection.fetch.register` rather than `webServer.register`: the former already applies Host/Origin checks and browser-credential validation, and the handler receives standard `Request`/`Response`.
+The path deliberately **avoids `/api`**: that prefix belongs to the shared RPC channel and its auth layer, so every `/api/*` request — including paths that do not exist — is rejected with 401 before a plugin's exact route can see it, and from outside one cannot tell whether the route exists. On the root path the request reaches webServer's exact table, and a miss is a 404, which is verifiable.
+
+Auth uses two independently checkable conditions: the source must be a loopback address, and a request carrying `Origin` must be same-origin with its `Host`. The switches only decide which UI modes are visible — no credentials or file contents — so that strength is proportionate.
 
 **No `Config` export**: this package does not depend on schemastery (a harness-internal package that may not resolve once the plugin is installed into a profile). Cordis's `resolveConfig` returns the raw configuration when no `Config` is present, so `readSwitches()` normalizes it itself — only a literal `true` counts as enabled.
 

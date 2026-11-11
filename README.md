@@ -39,16 +39,18 @@
 
 ### Host 半（`index.js`）
 
-按开关把启用的模式注册进 `agentPresets`，并开两条受连接鉴权的 Fetch 路由给设置页读写：
+按开关把启用的模式注册进 `agentPresets`，并在承载 GUI 的 webServer 上开一个读写端点给设置页：
 
 ```text
-GET  /api/chat-modes  -> { chat, extremeChat, statelessChat }
-POST /api/chat-modes  <- { key, enabled }
+GET  /chat-modes/switches  -> { chat, extremeChat, statelessChat }
+POST /chat-modes/switches  <- { key, enabled }
 ```
 
 写入走 `configEditor.edit()`，把值存进本插件这一行的配置里——这是插件保存自身配置的官方途径。改完 Loader 会重启本插件，`apply` 用新配置重新注册一遍，所以开关状态在重启后依然生效。
 
-路由用 `connection.fetch.register` 而不是 `webServer.register`：前者已经内置 Host/Origin 与浏览器凭据校验，回调拿到的是标准 `Request`/`Response`。
+路径刻意**不放在 `/api` 下**：那个前缀整体归共享 RPC 通道与它的鉴权层所有，任何 `/api/*` 请求（包括根本不存在的路径）都会先被拦成 401，插件自己的 exact 路由拿不到请求，也无法从外部判断路由是否存在。挂在根路径上则命中 webServer 的 exact 表，未命中是 404，可验证。
+
+鉴权用两条可独立验证的判据：来源必须是回环地址，且若请求带 `Origin` 必须与 Host 同源。开关只是「哪个 UI 模式可见」，不含凭据或文件内容，这个强度是相称的。
 
 **没有导出 `Config`**：本包不依赖 schemastery（它是 harness 内部包，装进 profile 后不一定解析得到）。Cordis 的 `resolveConfig` 在没有 `Config` 时直接原样返回配置，所以由 `readSwitches()` 自己归一化——只有字面量 `true` 才算开启。
 
