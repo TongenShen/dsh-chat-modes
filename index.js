@@ -53,11 +53,36 @@ export const DEFAULT_SWITCHES = {
   statelessChat: true,
 }
 
-/** 三个模式的 identity 与在预设列表里的位置。 */
+/**
+ * 三个模式的 identity、展示名与在预设列表里的位置。
+ *
+ * `description` 是新会话选择器里显示在模式名下方的那行简介：宿主的
+ * `presetDisplayText()`（`dsh-client-ui-agent-preset/lib/client.js:1292`）直接读
+ * 这个字段，缺了就整行不显示。它**不经过 i18n**——内置预设的文案才会走词典，
+ * 所以这里只能给一种语言，按本插件其余面向用户的文案统一用中文。
+ */
 const MODES = [
-  { key: 'chat', id: 'chat', name: 'Chat', order: 0 },
-  { key: 'extremeChat', id: 'extreme-chat', name: 'Extreme Chat', order: 1 },
-  { key: 'statelessChat', id: 'stateless-chat', name: 'Stateless Chat', order: 2 },
+  {
+    key: 'chat',
+    id: 'chat',
+    name: 'Chat',
+    description: '日常聊天：载入 AGENTS.md，只保留联网搜索，其余工具全部屏蔽。',
+    order: 0,
+  },
+  {
+    key: 'extremeChat',
+    id: 'extreme-chat',
+    name: 'Extreme Chat',
+    description: '极限模式：零系统提示词、零工具、不加载 AGENTS.md 和技能目录，模型只看到你的输入和自己的输出。',
+    order: 1,
+  },
+  {
+    key: 'statelessChat',
+    id: 'stateless-chat',
+    name: 'Stateless Chat',
+    description: '无上下文模式：每轮只把你的新输入发给模型，之前的对话不进入请求，界面仍保留完整记录。',
+    order: 2,
+  },
 ]
 
 /** 新建一个压缩组，避免三个预设共用同一个对象引用。 */
@@ -172,6 +197,7 @@ async function registerEnabled(ctx, switches) {
       const dispose = await ctx.agentPresets.register({
         id: mode.id,
         name: mode.name,
+        description: mode.description,
         order: mode.order,
         plugins: BUILDERS[mode.key](),
       })
