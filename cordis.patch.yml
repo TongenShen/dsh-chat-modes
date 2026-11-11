@@ -1,0 +1,8 @@
+# 三个聊天模式的打包插件。
+#
+# 这里只插入一个 Host 行：它自己按设置页的开关，把启用的预设注册到
+# agentPresets 注册表。三个预设的定义写在 index.js 里（不是 YAML 行），
+# 因为要不要注册取决于运行时的开关状态，而 YAML 行在加载时就固定了。
+- insert:
+    - id: chat-modes
+      name: 'dsh-chat-modes'

@@ -1,0 +1,64 @@
+{
+  "name": "dsh-chat-modes",
+  "version": "1.0.0",
+  "description": "把 Chat / Extreme Chat / Stateless Chat 三个聊天模式打包成一个插件：安装即有三个预设，并可在设置页逐个开关，关掉的模式不会出现在新会话的预设列表里。",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./chat-no-tools": "./chat-no-tools.js",
+    "./extreme-chat-no-tools": "./extreme-chat-no-tools.js",
+    "./stateless-chat": "./stateless-chat.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "chat-no-tools.js",
+    "extreme-chat-no-tools.js",
+    "stateless-chat.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.en.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "agent-preset",
+    "chat",
+    "stateless"
+  ],
+  "author": "TongenShen",
+  "license": "MIT",
+  "engines": {
+    "dsh": ">=0.2.1-rc.1",
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TongenShen/dsh-chat-modes.git"
+  },
+  "homepage": "https://github.com/TongenShen/dsh-chat-modes#readme",
+  "bugs": {
+    "url": "https://github.com/TongenShen/dsh-chat-modes/issues"
+  }
+}
