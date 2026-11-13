@@ -62,7 +62,7 @@ POST /chat-modes/switches  <- { key, enabled }
 
 - **Chat** 用 `deny: ['working_directory']` 屏蔽 Host 全局工具，保留自家的联网搜索
 - **Extreme** 用 `allow: []` 清空全部继承工具，并遮蔽唯一标了 `required: true` 的 `working-directory:current` 上下文
-- **Stateless** 在 `agent/pre-step` 里把历史从模型可见 surface 上遮蔽掉（替换成空 content 的 system 节点，`deriveEventMessage` 会丢弃它），界面读的是原始日志所以不受影响
+- **Stateless** 在 `agent/pre-step` 里把历史从模型可见 surface 上遮蔽掉（替换成空 content 的 system 节点，`deriveEventMessage` 会丢弃它），界面读的是原始日志所以不受影响。注意遮蔽区间必须跳过 surface 的 node 0：`assertSystemHeadRewrite` 规定 node 0 若是 `system/message`，只能被一条恰好只覆盖它自己的 `system/message` 替换，跨节点覆盖会被拒、append 抛错。而 node 0 必定是 system 节点（第一次请求时由 `SystemPromptProjection` 占位），所以整段遮蔽在真实会话里一定会失败，且失败被 `catch` 吞掉后表现为"仍然带着历史"
 
 ## 安装
 

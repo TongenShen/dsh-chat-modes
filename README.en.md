@@ -60,7 +60,7 @@ Auth uses two independently checkable conditions: the source must be a loopback 
 
 - **Chat** masks host-global tools with `deny: ['working_directory']` while keeping its own web search
 - **Extreme** clears every inherited tool with `allow: []` and shadows `working-directory:current`, the one runtime context marked `required: true`
-- **Stateless** shadows history on the model-visible surface in `agent/pre-step`, replacing it with an empty-content system node that `deriveEventMessage` drops; the UI reads the raw log and is unaffected
+- **Stateless** shadows history on the model-visible surface in `agent/pre-step`, replacing it with an empty-content system node that `deriveEventMessage` drops; the UI reads the raw log and is unaffected. The shadowed range must skip surface node 0: `assertSystemHeadRewrite` allows a `system/message` at node 0 to be replaced only by a `system/message` covering exactly that node, so a multi-node replace is rejected and the append throws. Node 0 is always a system node (`SystemPromptProjection` claims it on the first request), so a full-range shadow always fails on real sessions — and because the throw is caught, the symptom is simply "history is still there"
 
 ## Install
 

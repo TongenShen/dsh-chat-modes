@@ -1,6 +1,6 @@
 {
   "name": "dsh-chat-modes",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "把 Chat / Extreme Chat / Stateless Chat 三个聊天模式打包成一个插件：安装即有三个预设，并可在设置页逐个开关，关掉的模式不会出现在新会话的预设列表里。",
   "type": "module",
   "main": "./index.js",
