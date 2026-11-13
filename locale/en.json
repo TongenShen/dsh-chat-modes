@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Chat modes",
-    "description": "Bundles the Chat, Extreme Chat, and Stateless Chat presets, with a settings page to switch each one on or off."
+    "description": "Bundles the Chat and Extreme Chat presets, with a settings page to switch each one on or off."
   }
 }

@@ -16,7 +16,7 @@ description: 给 dsh-chat-modes 插件新增一个聊天模式。当用户要求
 只有需要**运行时干预**时才新建 `<name>.js`：
 
 - 要拦截工具/注册表 → `ctx.tools.restrict(...)`（参考 `chat-no-tools.js`）
-- 要挂钩子改写请求 → `ctx.on('agent/pre-step', ...)`（参考 `stateless-chat.js`）
+- 要挂钩子改写请求 → `ctx.on('agent/pre-step', ...)`（参考 `@deepseek-ai/dsh-plan-mode` 的用法）
 
 新建文件时，必须同时在 `package.json` 的 `exports` 加一条 `"./<name>": "./<name>.js"`，否则预设行解析不到。
 
@@ -30,7 +30,6 @@ description: 给 dsh-chat-modes 插件新增一个聊天模式。当用户要求
 export const DEFAULT_SWITCHES = {
   chat: true,
   extremeChat: true,
-  statelessChat: true,
   <newKey>: true,        // ← 新增
 }
 ```
@@ -44,7 +43,7 @@ export const DEFAULT_SWITCHES = {
 ```js
   {
     key: '<newKey>',                    // 与 DEFAULT_SWITCHES 的 key 逐字一致
-    id: '<new-mode-id>',                // 全局唯一，不能与 chat / extreme-chat / stateless-chat 或三个独立包同名
+    id: '<new-mode-id>',                // 全局唯一，不能与 chat / extreme-chat 或两个独立包同名
     name: 'Display Name',
     description: '一句话说明这个模式的行为差异。',   // 显示在新会话选择器里，不走 i18n，只能一种语言
     order: 3,
@@ -55,7 +54,7 @@ export const DEFAULT_SWITCHES = {
 
 ## 第 3 处：`index.js` 的 builder 函数 + `BUILDERS`
 
-先写 builder（放在现有三个 builder 之后、`BUILDERS` 之前）：
+先写 builder（放在现有两个 builder 之后、`BUILDERS` 之前）：
 
 ```js
 /**
@@ -83,12 +82,11 @@ function <newKey>Plugins() {
 const BUILDERS = {
   chat: chatPlugins,
   extremeChat: extremePlugins,
-  statelessChat: statelessPlugins,
   <newKey>: <newKey>Plugins,           // ← 新增
 }
 ```
 
-`compactionGroup()` 要不要带，看这个模式是否保留历史：`statelessPlugins()` 没有带，因为它每轮都清历史，压缩插件无从下手。
+`compactionGroup()` 要不要带，看这个模式是否保留历史：清空历史的模式不该带，压缩插件无从下手；保留历史的模式必须带，否则长会话会撑爆上下文。
 
 ## 第 4 处：`client.js` 的 `ROWS`
 
@@ -96,7 +94,6 @@ const BUILDERS = {
     const ROWS = [
       { key: 'chat', title: 'Chat', description: '...' },
       { key: 'extremeChat', title: 'Extreme Chat', description: '...' },
-      { key: 'statelessChat', title: 'Stateless Chat', description: '...' },
       { key: '<newKey>', title: 'Display Name', description: '设置页的一句话说明。' },   // ← 新增
     ]
 ```

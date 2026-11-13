@@ -1,14 +1,13 @@
 {
   "name": "dsh-chat-modes",
   "version": "1.0.2",
-  "description": "把 Chat / Extreme Chat / Stateless Chat 三个聊天模式打包成一个插件：安装即有三个预设，并可在设置页逐个开关，关掉的模式不会出现在新会话的预设列表里。",
+  "description": "把 Chat / Extreme Chat 两个聊天模式打包成一个插件：安装即有两个预设，并可在设置页逐个开关，关掉的模式不会出现在新会话的预设列表里。",
   "type": "module",
   "main": "./index.js",
   "exports": {
     ".": "./index.js",
     "./chat-no-tools": "./chat-no-tools.js",
     "./extreme-chat-no-tools": "./extreme-chat-no-tools.js",
-    "./stateless-chat": "./stateless-chat.js",
     "./client": "./client.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./locale/*.json": "./locale/*.json",
@@ -19,7 +18,6 @@
     "index.js",
     "chat-no-tools.js",
     "extreme-chat-no-tools.js",
-    "stateless-chat.js",
     "client.js",
     "cordis.patch.yml",
     "locale/*.json",
@@ -33,7 +31,7 @@
     "deepseek-harness",
     "agent-preset",
     "chat",
-    "stateless"
+    "extreme"
   ],
   "author": "TongenShen",
   "license": "MIT",

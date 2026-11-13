@@ -1,7 +1,7 @@
 /**
- * 三个聊天模式的设置页（Client 半）。
+ * 两个聊天模式的设置页（Client 半）。
  *
- * 在「设置 → Agent presets」组的同一排里加一个独立页面，三行开关。
+ * 在「设置 → Agent presets」组的同一排里加一个独立页面，两行开关。
  * 开关状态通过 `/api/chat-modes/bundle` 读写，由 Host 侧持久化到插件自己的配置行。
  *
  * 只 `require('react')`：宿主 Client 模块表提供它，不 import 任何
@@ -17,11 +17,10 @@ window.__ModuleLoader__.load({
     const CLS = 'dcm'
     const ENDPOINT = '/chat-modes/switches'
 
-    /** 三行开关的定义，顺序与 Host 侧 MODES 一致。 */
+    /** 两行开关的定义，顺序与 Host 侧 MODES 一致。 */
     const ROWS = [
       { key: 'chat', title: 'Chat', description: '带人设、AGENTS.md 和联网搜索的日常聊天。' },
       { key: 'extremeChat', title: 'Extreme Chat', description: '零系统提示词、零工具，模型只看得到你的输入和自己的输出。' },
-      { key: 'statelessChat', title: 'Stateless Chat', description: '每轮只发送你的新输入，模型不记得之前说过什么；界面仍保留完整记录。' },
     ]
 
     const ZH = {
@@ -35,8 +34,6 @@ window.__ModuleLoader__.load({
       'row.chat.description': '带人设、AGENTS.md 和联网搜索的日常聊天。',
       'row.extremeChat.title': 'Extreme Chat',
       'row.extremeChat.description': '零系统提示词、零工具，模型只看得到你的输入和自己的输出。',
-      'row.statelessChat.title': 'Stateless Chat',
-      'row.statelessChat.description': '每轮只发送你的新输入，模型不记得之前说过什么；界面仍保留完整记录。',
       'nav.label': '聊天模式',
     }
 
@@ -51,8 +48,6 @@ window.__ModuleLoader__.load({
       'row.chat.description': 'Everyday chat with a persona, AGENTS.md, and web search.',
       'row.extremeChat.title': 'Extreme Chat',
       'row.extremeChat.description': 'No system prompt, no tools — the model sees only your input and its own replies.',
-      'row.statelessChat.title': 'Stateless Chat',
-      'row.statelessChat.description': 'Sends only your latest message; the model remembers nothing. The transcript still keeps every turn.',
       'nav.label': 'Chat modes',
     }
 

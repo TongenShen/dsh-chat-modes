@@ -1,5 +1,5 @@
 /**
- * 三个聊天模式的打包插件（Host 半）。
+ * 两个聊天模式的打包插件（Host 半）。
  *
  * 两件事：
  *
@@ -9,7 +9,7 @@
  *    不受影响，保留它们启动时的组合。
  *
  * 2. 在承载 GUI 的 webServer 上注册一个读写端点，供设置页使用：
- *      GET  /chat-modes/switches  -> { chat, extremeChat, statelessChat }
+ *      GET  /chat-modes/switches  -> { chat, extremeChat }
  *      POST /chat-modes/switches  <- { key, enabled }
  *    写入走 `configEditor.edit()`，把值存进本插件这一行的配置里。
  *
@@ -46,15 +46,14 @@ export const inject = ['agentPresets']
  */
 export const SWITCH_PATH = '/chat-modes/switches'
 
-/** 开关默认值：装完三个模式都能用。 */
+/** 开关默认值：装完两个模式都能用。 */
 export const DEFAULT_SWITCHES = {
   chat: true,
   extremeChat: true,
-  statelessChat: true,
 }
 
 /**
- * 三个模式的 identity、展示名与在预设列表里的位置。
+ * 两个模式的 identity、展示名与在预设列表里的位置。
  *
  * `description` 是新会话选择器里显示在模式名下方的那行简介：宿主的
  * `presetDisplayText()`（`dsh-client-ui-agent-preset/lib/client.js:1292`）直接读
@@ -76,16 +75,9 @@ const MODES = [
     description: '极限模式：零系统提示词、零工具、不加载 AGENTS.md 和技能目录，模型只看到你的输入和自己的输出。',
     order: 1,
   },
-  {
-    key: 'statelessChat',
-    id: 'stateless-chat',
-    name: 'Stateless Chat',
-    description: '无上下文模式：每轮只把你的新输入发给模型，之前的对话不进入请求，界面仍保留完整记录。',
-    order: 2,
-  },
 ]
 
-/** 新建一个压缩组，避免三个预设共用同一个对象引用。 */
+/** 新建一个压缩组，避免两个预设共用同一个对象引用。 */
 function compactionGroup() {
   return {
     id: 'compaction',
@@ -148,31 +140,15 @@ function extremePlugins() {
   ]
 }
 
-/**
- * 无上下文：在极限基础上，每轮把历史从模型可见 surface 上遮蔽掉。
- * @returns 该预设的插件行列表。
- */
-function statelessPlugins() {
-  return [
-    {
-      id: 'persona',
-      name: '@deepseek-ai/dsh-persona',
-      config: { prefix: '', complete: true, includeRuntimeContext: false },
-    },
-    { id: 'stateless-chat', name: 'dsh-chat-modes/stateless-chat' },
-  ]
-}
-
 const BUILDERS = {
   chat: chatPlugins,
   extremeChat: extremePlugins,
-  statelessChat: statelessPlugins,
 }
 
 /**
  * 归一化开关值：只有字面量 `true` 才算开启，缺省按默认值。
  * @param config - 本行配置，可能是 undefined 或含脏值。
- * @returns 三个 key 的布尔值。
+ * @returns 两个 key 的布尔值。
  */
 export function readSwitches(config) {
   const source = config !== null && typeof config === 'object' ? config : {}
@@ -213,7 +189,7 @@ async function registerEnabled(ctx, switches) {
 /**
  * Host 入口。
  * @param ctx - 本行的 context。
- * @param config - 本行配置（三个开关）。
+ * @param config - 本行配置（两个开关）。
  */
 export function apply(ctx, config) {
   const switches = readSwitches(config)
